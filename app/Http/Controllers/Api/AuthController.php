@@ -15,14 +15,16 @@ class AuthController extends Controller
         $request->validate([
             'name' => 'required', 
             'email' => 'required|email', 
-            'password' => 'required|min:6'
+            'password' => 'required|min:6',
+            'dni' => 'required|min:6'
         ]);
 
 
         $user = User::create([
             'name' => $request->name, 
-            'email' => $request->email, 
-            'password' => bcrypt($request->password)
+            'email' => $request->email,
+            'password' => bcrypt($request->password),
+            'dni' => $request->dni
         ]);
 
         return response()->json($user);

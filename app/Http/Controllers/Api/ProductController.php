@@ -10,10 +10,9 @@ use App\Http\Controllers\Controller;
 class ProductController extends Controller
 {
     public function index(){
-        $products = Product::with('images')
+        return Product::with('images')
             ->with('prices')
             ->get();
-        dd($products);
     }
 
     public function store(Request $request){

@@ -11,9 +11,7 @@ use Illuminate\Support\Facades\Response;
 class ProductImageController extends Controller
 {
     function index(){
-        $data = ProductImage::all();
-        //return view('store_image', compact('data'));
-        dd($data);
+        return ProductImage::all();
     }
 
     function store(Request $request){
@@ -24,16 +22,13 @@ class ProductImageController extends Controller
 
         $entry = $request->all();
 
-        if($file = $request->product_image){
-            $name = $file->getClientOriginalName();
-            $path = 'img/products';
-            $file->move($path, $name);
-            $image = $path."/".$name;
-            $entry['product_image']=$image;
-        }
+        $name = $file->getClientOriginalName();
+        $path = 'img/products';
+        $file->move($path, $name);
+        $image = $path."/".$name;
+        $entry['product_image']=$image;
 
         $count = ProductImage::where('product_image', '=', $image)
-            ->get()
             ->count();
 
         if ($count <= 1)

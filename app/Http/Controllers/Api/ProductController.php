@@ -30,6 +30,25 @@ class ProductController extends Controller
         ]);
     }
 
+    public function update(Request $request, Product $product){
+
+        $request->validate([
+            'name' => 'min:5|max:50',
+            'description' => 'min:10|max:50',
+            'stock' => 'min:0'
+        ]);
+
+        $product->name = $request->input('name'); //$request->name
+        $product->description = $request->input('description');
+        $product->stock = $request->input('stock');
+        $product->save();
+
+        return response()->json([
+            'success' => true,
+        'message' => 'The product has been successfully updated'
+        ]);
+    }
+
     public function getImages(Product $product){
         return $product->images()->get();
     }

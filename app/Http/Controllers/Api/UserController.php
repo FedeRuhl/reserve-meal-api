@@ -15,10 +15,22 @@ class UserController extends Controller
     }
 
     public function update(Request $request){
+
+        $request->validate([
+            'name' => 'min:5|max:30',
+            'user_id' => 'min:6|max:10',
+            'email' => 'email'
+        ]);
+
         $user = Auth::guard('api')->user();
         $user->name = $request->input('name'); //$request->name
-        $user->phone = $request->input('phone');
-        $user->address = $request->input('address');
+        $user->dni = $request->input('dni');
+        $user->email = $request->input('email');
         $user->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'The user has been successfully updated'
+        ]);
     }
 }

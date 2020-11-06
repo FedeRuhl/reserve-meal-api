@@ -7,9 +7,12 @@ use App\Models\ProductImage;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\File;
 
 class ProductImageController extends Controller
 {
+    private $path = 'img/products';
+
     function index(){
         return ProductImage::all();
     }
@@ -20,20 +23,22 @@ class ProductImageController extends Controller
             'product_image' => 'required|unique:product_images,product_image' //max:2048
         ]);
 
-        $entry = $request->all();
+        
+        $name = $request->file('product_image')
+                ->getClientOriginalName();
+        $fullPath = $this->path."/".$name;
 
-        $name = $file->getClientOriginalName();
-        $path = 'img/products';
-        $file->move($path, $name);
-        $image = $path."/".$name;
-        $entry['product_image']=$image;
-
-        $count = ProductImage::where('product_image', '=', $image)
-            ->count();
+        $count = $this->countProductsSamePhoto($fullPath);
 
         if ($count <= 1)
         {
-            $productImage = ProductImage::create($entry);
+            $request->file('product_image')
+                ->move($this->path, $name);
+
+            $productImage = ProductImage::create([
+                'product_id' => $request->product_id,
+                'product_image' => $fullPath
+            ]);
 
             return response()->json([
                 'success' => true,
@@ -49,5 +54,46 @@ class ProductImageController extends Controller
             ]);
         }
         
+    }
+
+    function update(Request $request, ProductImage $productImage){
+        $request->validate([
+            'product_image' => 'required|unique:product_images,product_image'
+        ]);
+
+        if (File::exists($productImage->product_image)){
+
+            File::delete($productImage->product_image);
+
+            $name = $request->file('product_image')
+                ->getClientOriginalName();
+            $fullPath = $this->path."/".$name;
+
+            $request->file('product_image')
+                ->move($this->path, $name);
+
+            $productImage->product_image = $fullPath;
+            $productImage->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'The image product has been successfully updated',
+                'image' => $productImage
+            ]);
+        }
+        else{
+            return response()->json([
+                'success' => false,
+                'message' => 'The image is not on our servers'
+            ]);
+        }
+        
+        $productImage->product_image = $this->getFullPath($request->file('product_image'));
+
+    }
+
+    private function countProductsSamePhoto($image){
+        return ProductImage::where('product_image', '=', $image)
+            ->count();
     }
 }

@@ -32,6 +32,7 @@ Route::middleware('auth:api')->group(function (){
     //product images
     Route::get('productImages', 'ProductImageController@index');
     Route::post('productImages/store', 'ProductImageController@store');
+    Route::post('productImages/{productImage}/update', 'ProductImageController@update');
     
     //product prices
     Route::post('productPrices/store', 'ProductPriceController@store');

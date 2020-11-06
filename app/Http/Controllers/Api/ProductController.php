@@ -45,7 +45,7 @@ class ProductController extends Controller
 
         return response()->json([
             'success' => true,
-        'message' => 'The product has been successfully updated'
+            'message' => 'The product has been successfully updated'
         ]);
     }
 

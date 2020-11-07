@@ -17,10 +17,10 @@ class CreateProductPricesTable extends Migration
             $table->id();
             $table->timestamps(); //created_at -> date_since
 
-            $year = date("Y");
-            $defaultDate = "{$year}-12-31";
+            /*$year = date("Y");
+            $defaultDate = "{$year}-12-31";*/
 
-            $table->timestamp('date_until')->default($defaultDate);
+            $table->timestamp('date_until')->default('2037-01-19 03:14:07'); //max mysql timestamp
             $table->decimal('price');
 
             $table->unsignedBigInteger('product_id');

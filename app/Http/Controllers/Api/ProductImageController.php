@@ -87,8 +87,6 @@ class ProductImageController extends Controller
                 'message' => 'The image is not on our servers'
             ]);
         }
-        
-        $productImage->product_image = $this->getFullPath($request->file('product_image'));
 
     }
 

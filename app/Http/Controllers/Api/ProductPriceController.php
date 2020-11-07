@@ -15,11 +15,20 @@ class ProductPriceController extends Controller
             'product_id' => 'required'
         ]);
 
-        $productPrice = ProductPrice::create($request->all(['date_until', 'price', 'product_id']));
+        $productPrice = ProductPrice::create($request->all(['price', 'product_id']));
 
         return response()->json([
             'success' => true,
             'product' => $productPrice
         ]);
+    }
+
+    public function update(Request $request, ProductPrice $productPrice){
+        $productPrice->date_until = date('Y-m-d H:i:s');
+        $productPrice->save();
+
+        $request['product_id'] = $productPrice->Product()
+                                ->select('id')->first()['id'];
+        return $this->store($request);
     }
 }

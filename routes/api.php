@@ -26,7 +26,7 @@ Route::middleware('auth:api')->group(function (){
     Route::post('products/store', 'ProductController@store');
     Route::post('products/{product}/update', 'ProductController@update');
     Route::get('products/{product}/images', 'ProductController@getImages');
-    Route::get('products/{product}/prices', 'ProductController@getPrices');
+    Route::get('products/{product}/price', 'ProductController@getActualPrice');
     Route::get('products', 'ProductController@index'); //testing eager loading
 
     //product images
@@ -36,6 +36,7 @@ Route::middleware('auth:api')->group(function (){
     
     //product prices
     Route::post('productPrices/store', 'ProductPriceController@store');
+    Route::post('productPrices/{productPrice}/update', 'ProductPriceController@update');
 
     //reserevation
     Route::post('reservations/store', 'ReservationController@store');

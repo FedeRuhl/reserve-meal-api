@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 
 use App\Models\Product;
 use App\Http\Controllers\Controller;
+use Carbon\Carbon;
 
 class ProductController extends Controller
 {
@@ -53,7 +54,9 @@ class ProductController extends Controller
         return $product->images()->get();
     }
 
-    public function getPrices(Product $product){
-        return $product->prices()->get();
+    public function getActualPrice(Product $product){
+        $now = Carbon::now()->toDateTimeString();
+        return $product->prices()
+            ->where('date_until', '>', $now)->get();
     }
 }

@@ -10,4 +10,9 @@ class ProductPrice extends Model
     use HasFactory;
 
     protected $fillable = ['date_until', 'price', 'product_id'];
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
 }

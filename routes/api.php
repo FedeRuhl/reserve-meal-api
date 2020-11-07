@@ -42,6 +42,7 @@ Route::middleware('auth:api')->group(function (){
     Route::post('productPrices/{productPrice}/update', 'ProductPriceController@update');
 
     //reserevation
+    Route::get('reservations', 'ReservationController@index');
     Route::post('reservations/store', 'ReservationController@store');
 
 });

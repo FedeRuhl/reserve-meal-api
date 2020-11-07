@@ -9,5 +9,5 @@ class Reservation extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['scheduled_date', 'user_id', 'product_id'];
+    protected $fillable = ['scheduled_date', 'user_id', 'product_id', 'price'];
 }

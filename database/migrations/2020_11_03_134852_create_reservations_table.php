@@ -17,6 +17,7 @@ class CreateReservationsTable extends Migration
             $table->id();
             $table->timestamps(); //created_at -> purchase_time
             $table->dateTime('scheduled_date');
+            $table->decimal('price');
 
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');

@@ -24,7 +24,8 @@ class ReservationFactory extends Factory
         return [
             'scheduled_date' => $this->faker->dateTimeBetween($startDate = 'now', $endDate = '+3 months', $timezone = null),
             'user_id' => $this->faker->numberBetween(1, 51),
-            'product_id' => $this->faker->numberBetween(1, 50)
+            'product_id' => $this->faker->numberBetween(1, 50),
+            'price' => $this->randomFloat($nbMaxDecimals = 2, $min = 0, $max = NULL)
         ];
     }
 }

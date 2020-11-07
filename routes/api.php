@@ -22,6 +22,9 @@ Route::middleware('auth:api')->group(function (){
     Route::get('user', 'UserController@show');
     Route::post('user', 'UserController@update');
 
+    //admin
+    Route::post('user/{user}/funds', 'AdminController@addFunds');
+
     //product
     Route::post('products/store', 'ProductController@store');
     Route::post('products/{product}/update', 'ProductController@update');

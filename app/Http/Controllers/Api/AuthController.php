@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 
 use App\Models\User;
 use Auth;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Notifications\Notifiable;
 
 class AuthController extends Controller
 {
@@ -50,6 +52,14 @@ class AuthController extends Controller
                 'jwt' => $token->accessToken
             ]);
         }
+
+        else
+        {
+            return response()->json([
+                'success' => false,
+                'message' => 'Incorrect credentials.'
+            ]);
+        }
     }
 
     public function logout(Request $request){
@@ -57,6 +67,47 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'Successfully logged out'
+        ]);
+    }
+
+    public function forgot(Request $request)
+    {
+        $credentials = $request->validate([
+            'email' => 'required|email'
+        ]);
+
+        Password::sendResetLink($credentials);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Reset password link sent on your email id.'
+        ]);
+    }
+
+    public function reset(Request $request)
+    {
+        $credentials = $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|confirmed',
+            'token' => 'required|string'
+        ]);
+
+        $email_password_status = Password::reset($credentials, function($user, $password){
+            $user->password = bcrypt($password);
+            $user->save();
+        });
+
+        if ($email_password_status == Password::INVALID_TOKEN)
+        {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid reset password token.'
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Password successfully changed.'
         ]);
     }
 }

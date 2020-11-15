@@ -69,6 +69,7 @@ class ReservationController extends Controller
 
             return response()->json([
                 'success' => true,
+                'message' => "The product has been successfully updated",
                 'reservation' => $reservation
             ]);
         }
@@ -80,5 +81,33 @@ class ReservationController extends Controller
             ]);
         }
         
+    }
+
+    public function update(Request $request, Reservation $reservation)
+    {
+        $request->validate([
+            'scheduled_date' => 'date',
+            'product_id' => 'integer'
+        ]);
+
+        $reservation->scheduled_date = ($request->input('scheduled_date')) ? $request->input('scheduled_date') : $reservation->scheduled_date;
+        $reservation->product_id = ($request->input('product_id')) ? $request->input('product_id') : $reservation->product_id;
+        $reservation->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'The reservation has been successfully updated',
+            'reservation' => $reservation
+        ]);
+    }
+
+    public function destroy(Reservation $reservation)
+    {
+        $delete = $reservation->delete();  
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'The reservation has been successfully deleted'
+        ]);
     }
 }

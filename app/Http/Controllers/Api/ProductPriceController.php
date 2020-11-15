@@ -19,6 +19,7 @@ class ProductPriceController extends Controller
 
         return response()->json([
             'success' => true,
+            'message' => 'The product price has been successfully created',
             'product' => $productPrice
         ]);
     }
@@ -29,6 +30,23 @@ class ProductPriceController extends Controller
 
         $request['product_id'] = $productPrice->Product()
                                 ->select('id')->first()['id'];
-        return $this->store($request);
+
+        $this->store($request);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'The product price has been successfully updated',
+            'productPrice' => $request->price
+        ]);
+    }
+
+    public function destroy(ProductPrice $productPrice)
+    {
+        $delete = $productPrice->delete();  
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'The product price has been successfully deleted'
+        ]);
     }
 }

@@ -27,6 +27,7 @@ class ProductController extends Controller
 
         return response()->json([
             'success' => true,
+            'message' => 'The product has been successfully created',
             'product' => $product
         ]);
     }
@@ -39,14 +40,25 @@ class ProductController extends Controller
             'stock' => 'min:0'
         ]);
 
-        $product->name = $request->input('name'); //$request->name
-        $product->description = $request->input('description');
-        $product->stock = $request->input('stock');
+        $product->name = ($request->input('name')) ? $request->input('name') : $product->name;
+        $product->description = ($request->input('description')) ? $request->input('description') : $product->description;
+        $product->stock = ($request->input('stock')) ? $request->input('stock') : $product->stock;
         $product->save();
 
         return response()->json([
             'success' => true,
-            'message' => 'The product has been successfully updated'
+            'message' => 'The product has been successfully updated',
+            'product' => $product
+        ]);
+    }
+
+    public function destroy(Product $product)
+    {
+        $product->delete();
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'The product has been successfully deleted'
         ]);
     }
 

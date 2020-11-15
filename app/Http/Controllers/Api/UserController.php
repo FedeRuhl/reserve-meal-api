@@ -24,14 +24,15 @@ class UserController extends Controller
         ]);
 
         $user = Auth::guard('api')->user();
-        $user->name = $request->input('name'); //$request->name
-        $user->dni = $request->input('dni');
-        $user->email = $request->input('email');
+        $user->name = ($request->input('name')) ? $request->input('name') : $user->name;
+        $user->dni = ($request->input('dni')) ? $request->input('dni') : $user->dni;
+        $user->email = ($request->input('email')) ? $request->input('email') : $user->email;
         $user->save();
 
         return response()->json([
             'success' => true,
-            'message' => 'The user has been successfully updated'
+            'message' => 'The user has been successfully updated',
+            'user' => $user
         ]);
     }
 }

@@ -42,6 +42,7 @@ class ProductImageController extends Controller
 
             return response()->json([
                 'success' => true,
+                'message' => 'The image product has been successfully created',
                 'image' => $productImage
             ]);
         }
@@ -57,6 +58,7 @@ class ProductImageController extends Controller
     }
 
     function update(Request $request, ProductImage $productImage){
+
         $request->validate([
             'product_image' => 'required|unique:product_images,product_image'
         ]);
@@ -88,6 +90,16 @@ class ProductImageController extends Controller
             ]);
         }
 
+    }
+
+    public function destroy(ProductImage $productImage)
+    {
+        $productImage->delete();
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'The product image has been successfully deleted'
+        ]);
     }
 
     private function countProductsSamePhoto($image){

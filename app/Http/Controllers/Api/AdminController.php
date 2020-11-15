@@ -24,11 +24,37 @@ class AdminController extends Controller
     
             return response()->json([
                 'success' => true,
-                'message' => 'The user has successfully received the funds.'
+                'message' => 'The user has successfully received the funds.',
+                'user' => $user
             ]);
         }
 
         else{
+            return response()->json([
+                'success' => false,
+                'message' => $response->message()
+            ]);
+        }
+        
+    }
+
+    public function destroy(User $user)
+    {
+        $response = Gate::inspect('isAdmin');
+
+        if($response->allowed())
+        {
+            $name = $user->name;
+            $user->delete();
+            
+            return response()->json([
+                'success' => true,
+                'message' => "The user $name has been successfully deleted"
+            ]);
+        }
+
+        else
+        {
             return response()->json([
                 'success' => false,
                 'message' => $response->message()

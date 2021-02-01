@@ -35,11 +35,11 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            'email' => 'required|email|exists:users,email', 
+            'dni' => 'required|exists:users,dni', 
             'password' => 'required'
         ]);
 
-        if( Auth::attempt(['email'=>$request->email, 'password'=>$request->password]) ) {
+        if( Auth::attempt(['dni'=>$request->dni, 'password'=>$request->password]) ) {
             $user = Auth::user();
 
             $token = $user->createToken($user->email.'-'.now());
@@ -49,6 +49,7 @@ class AuthController extends Controller
 
             return response()->json([
                 //'user' => $user,
+                'success' => true,
                 'jwt' => $token->accessToken
             ]);
         }

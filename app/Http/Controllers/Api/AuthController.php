@@ -9,6 +9,9 @@ use App\Models\User;
 use Auth;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Notifications\Notifiable;
+use App\Mail\EmailDemo;
+use Illuminate\Support\Facades\Mail;
+use Str;
 
 class AuthController extends Controller
 {
@@ -74,11 +77,16 @@ class AuthController extends Controller
     public function forgot(Request $request)
     {
         $credentials = $request->validate([
-            'email' => 'required|email'
+            'email' => 'required|email|exists:users,email'
         ]);
 
-        Password::sendResetLink($credentials);
+        $code = Str::random(16);
+        Mail::to($request->email)->send(new EmailDemo($code));
 
+        $user = User::where('email', $credentials['email'])->first();
+        $user->verification_code = $code;
+        $user->save();
+        
         return response()->json([
             'success' => true,
             'message' => 'Reset password link sent on your email id.'
@@ -88,27 +96,33 @@ class AuthController extends Controller
     public function reset(Request $request)
     {
         $credentials = $request->validate([
+            'code' => 'required|string',
             'email' => 'required|email',
-            'password' => 'required|confirmed',
-            'token' => 'required|string'
+            'password' => 'required',
+            'password_confirmation' => 'required'
         ]);
 
-        $email_password_status = Password::reset($credentials, function($user, $password){
-            $user->password = bcrypt($password);
-            $user->save();
-        });
+        $user = User::where('email', $credentials['email'])->first();
+        $code = $user['verification_code'];
 
-        if ($email_password_status == Password::INVALID_TOKEN)
+        if ($credentials['code'] == $code
+            && $credentials['password'] === $credentials['password_confirmation'])
+        {
+            $user->password = bcrypt($credentials['password']);
+            $user->save();
+    
+            return response()->json([
+                'success' => true,
+                'message' => 'Password successfully changed.'
+            ]);
+        }
+        else
         {
             return response()->json([
                 'success' => false,
-                'message' => 'Invalid reset password token.'
+                'message' => "Verification code is incorrect or password don't match."
             ]);
         }
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Password successfully changed.'
-        ]);
+        
     }
 }

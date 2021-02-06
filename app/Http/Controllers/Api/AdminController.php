@@ -7,25 +7,34 @@ use Illuminate\Http\Request;
 
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
-
+use Illuminate\Support\Facades\Validator;
 class AdminController extends Controller
 {
-    public function addFunds(Request $request, User $user){ //user_id, amount
-
+    public function addFunds(Request $request){ //user_id, amount
+        
         $response = Gate::inspect('isAdmin');
 
         if($response->allowed()){
-            $request->validate([
-                'amount' => 'required|numeric'
+            $validator = Validator::make($request->all(), [
+                'amount' => 'required|numeric',
+                'dni' => 'required|integer'
             ]);
+
+            if ($validator->fails())
+            {
+                return response()->json([
+                    'success' => false,
+                    'message' => $validator->errors()->first(),
+                ]);
+            }
     
+            $user = User::where('dni', $request->dni)->first();
             $user->amount += $request->amount;        
             $user->save();
     
             return response()->json([
                 'success' => true,
-                'message' => 'The user has successfully received the funds.',
-                'user' => $user
+                'message' => 'The user has successfully received the funds.'
             ]);
         }
 

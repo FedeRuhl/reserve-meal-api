@@ -20,7 +20,7 @@ class ProductPriceController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'The product price has been successfully created',
-            'product' => $productPrice
+            'product_price' => $productPrice
         ]);
     }
 
@@ -36,7 +36,7 @@ class ProductPriceController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'The product price has been successfully updated',
-            'productPrice' => $request->price
+            'product_price' => $request->price
         ]);
     }
 

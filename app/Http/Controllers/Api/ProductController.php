@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Http\Controllers\Controller;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Validator;
 
 class ProductController extends Controller
 {
@@ -17,11 +18,19 @@ class ProductController extends Controller
     }
 
     public function store(Request $request){
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'name' => 'required',
             'description' => 'min:10',
             'stock' => 'min:0'
         ]);
+
+        if ($validator->fails())
+        {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first(),
+            ]);
+        }
 
         $product = Product::create($request->all(['name', 'description', 'stock']));
 

@@ -14,7 +14,7 @@ Route::middleware('auth:api')->group(function (){
     Route::put('users/{user}', 'UserController@update');
 
     //admin
-    Route::post('user/{user}/funds', 'AdminController@addFunds');
+    Route::post('user/add-funds', 'AdminController@addFunds');
     Route::delete('users/{user}', 'AdminController@destroy');
 
     //product

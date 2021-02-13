@@ -10,6 +10,7 @@ use App\Models\ProductPrice;
 use App\Models\Product;
 use Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Validator;
 
 class ReservationController extends Controller
 {
@@ -33,44 +34,58 @@ class ReservationController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'scheduled_date' => 'required|date',
-            'product_id' => 'required'
+            'product_id' => 'required',
+            'quantity' => 'required|integer',
+            'amount' => 'required|numeric'
         ]);
 
-        $productId = $request->product_id;
-        $scheduledDate = $request->scheduled_date;
-        $user = Auth::guard('api')->user();
+        if ($validator->fails())
+        {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first(),
+            ]);
+        }
 
-        $product = Product::findOrFail($productId);
+        $user = Auth::guard('api')->user();
+        $product = Product::findOrFail($request->product_id);
 
         $price = ProductPrice::select('price')
-                ->where('product_id', $productId)
+                ->where('product_id', $request->product_id)
                 //->where('date_until', '>', 'now')
                 ->orderBy('date_until', 'desc')
                 ->first()['price'];
 
-        if ($product->stock > 0 
-            && $user->amount >= $price) //stock maybe should be optional
+        if ($product->stock > $request->quantity 
+            && $user->amount >= $request->amount)
         {
+            if ($price * $request->quantity != $request->amount)
+            {
+                return response()->json([
+                    'success' => false,
+                    'message' => "The submitted data is not matching with our data. Please, try again later"
+                ]);
+            }
             $reservation = Reservation::create(
                 [
-                    'scheduled_date' => $scheduledDate,
-                    'price' => $price,
+                    'scheduled_date' => $request->scheduled_date,
+                    'product_id' => $request->product_id,
+                    'quantity' => $request->quantity,
+                    'amount' => $request->amount,
                     'user_id' => $user->id,
-                    'product_id' => $productId
                 ]);
             
-            $user->amount -= $price;
+            $user->amount -= $request->amount;
             $user->save();
 
-            $product->stock -= 1;
+            $product->stock -= $request->quantity;
             $product->save();
 
             return response()->json([
                 'success' => true,
-                'message' => "The product has been successfully updated",
-                'reservation' => $reservation
+                'message' => "The order has been successfully created"
             ]);
         }
         else

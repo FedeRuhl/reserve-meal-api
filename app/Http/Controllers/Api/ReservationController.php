@@ -125,4 +125,29 @@ class ReservationController extends Controller
             'message' => 'The reservation has been successfully deleted'
         ]);
     }
+
+    public function getByUser()
+    {
+        $user = Auth::guard('api')->user();
+        $reserves = Reservation::where('user_id', $user->id)
+            ->with('product')
+            ->get();
+
+        if ($reserves)
+        {
+            return response()->json([
+                'success' => true,
+                'message' => 'The user has been successfully found',
+                'reserves' => $reserves
+            ]);
+        }
+        else
+        {
+            return response()->json([
+                'success' => false,
+                'message' => 'The user is not found',
+                'reserves' => []
+            ]);
+        }
+    }
 }

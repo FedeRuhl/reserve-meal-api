@@ -32,13 +32,23 @@ class ProductController extends Controller
             ]);
         }
 
-        $product = Product::create($request->all(['name', 'description', 'stock']));
+        try
+        {
+            $product = Product::create($request->all(['name', 'description', 'stock']));
+            return response()->json([
+                'success' => true,
+                'message' => 'The product has been successfully created',
+                'product' => $product
+            ]);
+        }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'The product has been successfully created',
-            'product' => $product
-        ]);
+        catch(\Illuminate\Database\QueryException $exception)
+        {
+            return response()->json([
+                'success' => false,
+                'message' => $exception->getMessage()
+            ]);
+        }
     }
 
     public function update(Request $request, Product $product){

@@ -28,9 +28,11 @@ Route::middleware('auth:api')->group(function (){
     //product images
     Route::get('productImages', 'ProductImageController@index');
     Route::post('productImages/store', 'ProductImageController@store');
+    Route::post('productImages/storeAll', 'ProductImageController@storeAll');
     Route::post('productImages/{productImage}/update', 'ProductImageController@update');
     //Route::put('productImages/{productImage}', 'ProductImageController@update'); does not work
     Route::delete('productImages/{productImage}', 'ProductImageController@destroy');
+    Route::get('productImages/{productImage}', 'ProductImageController@getById');
     
     //product prices
     Route::post('productPrices/store', 'ProductPriceController@store');
@@ -39,6 +41,7 @@ Route::middleware('auth:api')->group(function (){
 
     //reserevation
     Route::get('reservations', 'ReservationController@index');
+    Route::get('my-reservations', 'ReservationController@getByUser');
     Route::post('reservations/store', 'ReservationController@store');
     Route::put('reservations/{reservation}', 'ReservationController@update');
     Route::delete('reservations/{reservation}', 'ReservationController@destroy');

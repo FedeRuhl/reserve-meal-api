@@ -12,7 +12,8 @@ use Illuminate\Support\Facades\Validator;
 class ProductController extends Controller
 {
     public function index(){
-        return Product::with('images')
+        return Product::orderBy('id', 'desc')
+            ->with('images')
             ->with('prices')
             ->get();
     }

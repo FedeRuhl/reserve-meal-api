@@ -29,6 +29,14 @@ class AdminController extends Controller
             }
     
             $user = User::where('dni', $request->dni)->first();
+            if (!$user)
+            {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'The user does not exist',
+                ]);
+            }
+
             $user->amount += $request->amount;        
             $user->save();
     

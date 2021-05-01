@@ -61,7 +61,7 @@ class AuthController extends Controller
         {
             return response()->json([
                 'success' => false,
-                'message' => 'Incorrect credentials.'
+                'message' => 'Incorrect credentials'
             ]);
         }
     }
@@ -80,16 +80,24 @@ class AuthController extends Controller
             'email' => 'required|email|exists:users,email'
         ]);
 
-        $code = Str::random(16);
+        $code = Str::random(6);
         Mail::to($request->email)->send(new EmailDemo($code));
 
         $user = User::where('email', $credentials['email'])->first();
+        if (!$user)
+        {
+            return response()->json([
+                'success' => false,
+                'message' => 'The user does not exist',
+            ]);
+        }
+
         $user->verification_code = $code;
         $user->save();
         
         return response()->json([
             'success' => true,
-            'message' => 'Reset password link sent on your email id.'
+            'message' => 'Reset password link sent on your email'
         ]);
     }
 
@@ -103,26 +111,39 @@ class AuthController extends Controller
         ]);
 
         $user = User::where('email', $credentials['email'])->first();
-        $code = $user['verification_code'];
 
-        if ($credentials['code'] == $code
-            && $credentials['password'] === $credentials['password_confirmation'])
-        {
-            $user->password = bcrypt($credentials['password']);
-            $user->save();
-    
-            return response()->json([
-                'success' => true,
-                'message' => 'Password successfully changed.'
-            ]);
-        }
-        else
+        if (!$user)
         {
             return response()->json([
                 'success' => false,
-                'message' => "Verification code is incorrect or password don't match."
+                'message' => 'The user does not exist',
+            ]);
+        }
+
+        $code = $user->verification_code;
+
+        if ($credentials['code'] != $code)
+        {
+            return response()->json([
+                'success' => false,
+                'message' => "Verification code is incorrect"
+            ]);
+        }
+
+        if ($credentials['password'] != $credentials['password_confirmation'])
+        {
+            return response()->json([
+                'success' => false,
+                'message' => "Passwords don't match."
             ]);
         }
         
+        $user->password = bcrypt($credentials['password']);
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Password successfully changed.'
+        ]);
     }
 }

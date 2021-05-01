@@ -58,7 +58,7 @@ class ReservationController extends Controller
                 ->orderBy('date_until', 'desc')
                 ->first()['price'];
 
-        if ($product->stock > $request->quantity 
+        if ($product->stock >= $request->quantity 
             && $user->amount >= $request->amount)
         {
             if ($price * $request->quantity != $request->amount)
@@ -130,7 +130,9 @@ class ReservationController extends Controller
     {
         $user = Auth::guard('api')->user();
         $reserves = Reservation::where('user_id', $user->id)
-            ->with('product')
+            //->whereRaw('scheduled_date >= NOW()')
+            ->orderBy('scheduled_date', 'desc')
+            ->with('product.images')
             ->get();
 
         if ($reserves)

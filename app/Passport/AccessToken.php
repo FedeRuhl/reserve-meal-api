@@ -40,7 +40,9 @@ class AccessToken extends BaseToken {
 
 		if ( $user = User::find( $this->getUserIdentifier() ) ) {
 			$builder
-                ->withClaim( 'uid', $user->id )
+                ->withClaim( 'uid', $user->id)
+				->withClaim('name', $user->name)
+				->withClaim('role', $user->role)
                 ->withClaim('email', $user->email);
 			// Include additional user claims for user here
 		}

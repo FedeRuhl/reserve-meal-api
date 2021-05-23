@@ -9,6 +9,8 @@ Route::post('password/email', 'AuthController@forgot');
 Route::post('password/reset', 'AuthController@reset');
 
 Route::middleware('auth:api')->group(function (){
+    Route::post('/logout', 'AuthController@logout');
+
     //user
     Route::get('user', 'UserController@show');
     Route::put('users/{user}', 'UserController@update');

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Http\Controllers\Controller;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 
 class ProductController extends Controller
@@ -19,35 +20,46 @@ class ProductController extends Controller
     }
 
     public function store(Request $request){
-        $validator = Validator::make($request->all(), [
-            'name' => 'required',
-            'description' => 'min:10',
-            'stock' => 'min:0'
-        ]);
+        $response = Gate::inspect('isAdmin');
 
-        if ($validator->fails())
+        if($response->allowed()){
+            $validator = Validator::make($request->all(), [
+                'name' => 'required',
+                'description' => 'min:10',
+                'stock' => 'min:0'
+            ]);
+    
+            if ($validator->fails())
+            {
+                return response()->json([
+                    'success' => false,
+                    'message' => $validator->errors()->first(),
+                ]);
+            }
+    
+            try
+            {
+                $product = Product::create($request->all(['name', 'description', 'stock']));
+                return response()->json([
+                    'success' => true,
+                    'message' => 'The product has been successfully created',
+                    'product' => $product
+                ]);
+            }
+    
+            catch(\Illuminate\Database\QueryException $exception)
+            {
+                return response()->json([
+                    'success' => false,
+                    'message' => $exception->getMessage()
+                ]);
+            }
+        }
+        else
         {
             return response()->json([
                 'success' => false,
-                'message' => $validator->errors()->first(),
-            ]);
-        }
-
-        try
-        {
-            $product = Product::create($request->all(['name', 'description', 'stock']));
-            return response()->json([
-                'success' => true,
-                'message' => 'The product has been successfully created',
-                'product' => $product
-            ]);
-        }
-
-        catch(\Illuminate\Database\QueryException $exception)
-        {
-            return response()->json([
-                'success' => false,
-                'message' => $exception->getMessage()
+                'message' => $response->message()
             ]);
         }
     }
